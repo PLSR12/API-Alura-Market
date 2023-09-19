@@ -21,6 +21,73 @@ class RoleService {
       throw new Error('Error ao cadastrar')
     }
   }
+
+  async buscarTodosRoles() {
+    const roles = await database.roles.findAll()
+
+    return roles
+  }
+
+  async buscarRolePorId(id) {
+    const role = await database.roles.findOne({
+      where: {
+        id: id,
+      },
+    })
+
+    if (!role) {
+      throw new Error('role informado não cadastrado!')
+    }
+
+    return role
+  }
+
+  async deletarRolePorId(id) {
+    const role = await database.roles.findOne({
+      where: {
+        id: id,
+      },
+    })
+
+    if (!role) {
+      throw new Error('role informado não cadastrado!')
+    }
+
+    try {
+      await database.roles.destroy({
+        where: {
+          id: id,
+        },
+      })
+    } catch (error) {
+      console.error('Message error: ', error.message)
+      throw error
+    }
+  }
+
+  async editarRole(dto) {
+    const role = await database.roles.findOne({
+      where: {
+        id: dto.id,
+      },
+    })
+
+    if (!role) {
+      throw new Error('role informado não cadastrado!')
+    }
+
+    try {
+      role.nome = dto.nome
+      role.descricao = dto.descricao
+
+      await role.save()
+
+      return await role.reload()
+    } catch (error) {
+      console.error('Message error: ', error.message)
+      throw error
+    }
+  }
 }
 
 module.exports = RoleService
